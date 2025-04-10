@@ -1,0 +1,375 @@
+body {
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    font-family: "Exo 2", sans-serif;
+    height: 100vh;
+    width: 100vw;
+    background: radial-gradient(50% 50% at 50% 50%, #441D3A 0%, #202035 100%);
+}
+
+/* .first-page{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+} */
+nav{
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+nav p{
+    color: rgb(159, 31, 120);
+    font-size: 40px;
+    font-weight: 600;
+    font-family: "Exo 2", sans-serif;
+    text-shadow: 3px 3px purple;
+}
+
+.main-login{
+    /* width: 100%; */
+    flex-direction: column;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* top: 50vh;
+    bottom: 50vh; */
+}
+
+.login-main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+footer{
+    position: relative;
+    display: flex;
+    flex-direction: center;
+    justify-content: center;
+    padding-top: 70px;
+    z-index:2;
+}
+
+.social-media {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.social-media a{
+    margin: 10px;
+}
+
+.social-media img {
+    transform: scale(100%);
+}
+
+.social-media img:hover {
+    transform: scale(110%);
+    transition: 0.1s;
+    animation: ease-in-out 1s infinite;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 0px 0px 0px 0px;
+    position: relative;
+}
+
+.nickname-button {
+    all: unset;
+    background: #6B224280;
+    width: 300px;
+    border-radius: 50px;
+    border: 2px solid #A73768;
+    font-family: "Exo 2", sans-serif;
+    padding: 10px;
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 43.2px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    box-shadow: 0px 4px 4px 0px #00000040;
+    caret-color: #BA5B84B2;
+    padding-left: 20px; 
+    color:#b86086b2;
+}
+.input_name{
+    padding-bottom: 50px;
+}
+::placeholder{
+    color: #BA5B84B2;
+}
+.nickname-button:focus {
+    border-color: #FF69B4;
+    box-shadow: 0 0 10px #FF69B4;
+}
+
+.nickname-button:focus::-webkit-input-placeholder{
+    opacity: 0;
+}
+
+.nickname-button:focus::-moz-placeholder{
+    opacity: 0;
+}
+
+.nickname-button:focus::-ms-placeholder{
+    opacity: 0;
+}
+
+.form-submit {
+    top: 50px;
+}
+
+.submit-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 220px;
+    height: 70px;
+}
+
+.submit-form {
+    display: flex;
+    align-items: center;
+    background: #41416C;
+    border: 0;
+    border-radius: 30px;
+    color: #F1CEDD;
+    padding-left: 40px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    width: 220px;
+    height: 70px;
+    font-family: "Exo 2", sans-serif;
+    font-size: 35px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.submit-container::before {
+    content: "";
+    position: absolute;
+    width: 34px;
+    height: 38px;
+    background-image: url('Polygon 2.png');
+    background-size: cover;
+    background-position: center;
+    top: 54%; 
+    left: 20px;
+    transform: translateY(-50%);
+}
+
+.form-submit input:hover {
+    background: #383869;
+}
+
+.form-submit input:active{
+    background: #2e2e57;
+}
+.main_text{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 20px;
+}
+
+.emblema{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+.main_name{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding-bottom: 100px;
+}
+
+.rules{
+    display: flex;
+    justify-self: end;
+    align-items: end;
+    padding-right: 10px;
+    flex-direction: row;
+}
+.rules_text{
+    font-family:"Exo 2", sans-serif;
+    color: rgba(241, 206, 221, 1);
+    font-size: 24px;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    line-height: 100%;
+    letter-spacing: 0%;
+    margin-bottom: 3px;
+    
+}
+.rules_img{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.rules_link {
+    display: flex;
+    justify-self: end;
+    align-items: end;
+    text-decoration: none; 
+    color: inherit;
+    flex-direction: row;
+    color: none;
+    background: none; /* або background-color: transparent; */
+    border: none;     /* якщо треба прибрати рамку */
+    cursor: pointer;  /* щоб при наведенні був вигляд кнопки */
+}
+
+
+
+.modal{
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: all 0.3 ease-in-out;
+    z-index: -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.open{
+    opacity: 1;
+    z-index: 999;
+}
+
+.modal-inner{
+    height: 100vh; 
+    width: 100vw; 
+    background: radial-gradient(50% 50% at 50% 50%, #441D3A 0%, #202035 100%);
+    overflow: hidden;
+}
+
+
+.cat {
+    display: flex;
+    justify-content: end;
+    align-items: flex-end;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 450px; /* changed from 450px */
+    height: 70px; /* changed from 70px */
+    border-radius: 30px; /* changed from 30px */
+    border: 0.1vh solid #41416C; /* changed from 1px */
+    background-color: #41416C;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1.8rem; /* changed from 30px */
+    font-weight: 600;
+    color: #F1CEDD;
+    text-transform: uppercase;
+    font-weight: 600;
+    line-height: 100%;
+    letter-spacing: 0%;
+    cursor: pointer;
+}
+.button_main {
+    display: flex;
+    justify-content: center;
+    padding-left: 13vw; /* changed from 220px */
+}
+.main_text {
+    display: flex;
+    justify-content: center;
+    text-transform: uppercase;
+    color: #fcb0d1;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    font-size: 2.2rem; /* changed from 35px */
+    line-height: 100%;
+    letter-spacing: 0%;
+    margin-bottom: 1.5vh; /* changed from 25px */
+}
+
+.main_text2 {
+    display: flex;
+    justify-content: center;
+    text-transform: uppercase;
+    color: #F1CEDD;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1.6rem; /* changed from 25px */
+    line-height: 100%;
+    letter-spacing: 0%;
+    margin-bottom: 1.5vh; /* changed from 25px */
+}
+.main_text3 {
+    display: flex;
+    justify-content: center;
+    color: #F1CEDD;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1.5rem; /* changed from 24px */
+    line-height: 100%;
+    letter-spacing: 0%;
+    margin-bottom: 1.8vh; /* changed from 30px */
+}
+.main_text4 {
+    display: flex;
+    justify-content: start;
+    color: #F1CEDD;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1.5rem; /* changed from 24px */
+    line-height: 100%;
+    letter-spacing: 0%;
+    margin-bottom: 2.2vh; /* changed from 35px */
+}
+
+.main_text5 {
+    display: flex;
+    justify-content: center;
+    color: #fcb0d1;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    font-size: 1.5rem; /* changed from 24px */
+    line-height: 100%;
+    letter-spacing: 0%;
+    margin-bottom: 1.8vh; /* changed from 30px */
+    margin-left: 12vw; /* changed from 200px */
+}
+
+.rules-modal {
+    display: flex;
+    justify-content: center;
+    padding: 2vh; /* changed from 30px */
+    flex-direction: column;
+}
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+.row2 {
+    display: flex;
+    justify-content: end;
+    padding-top: 2.5vh; /* changed from 40px */
+}
