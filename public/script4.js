@@ -20,7 +20,7 @@ const player_id = sessionStorage.getItem('player_id');
 
     // Функція для завантаження історії
     function loadStory(storyId) {
-        fetch(`http://localhost:3000/api/stories/${storyId}`)
+        fetch(`https://no-room-for-you.vercel.app/api/stories/${storyId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -63,7 +63,7 @@ const player_id = sessionStorage.getItem('player_id');
             event.preventDefault(); // Зупиняємо стандартну поведінку форми
             try {
                 const chosenStoryId = currentStoryId % 20 + 1;
-                const response = await fetch('http://localhost:3000/api/update-room-story', {
+                const response = await fetch('https://no-room-for-you.vercel.app/api/update-room-story', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
