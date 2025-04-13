@@ -309,7 +309,8 @@ form {
     font-size: 2.2rem; /* changed from 35px */
     line-height: 100%;
     letter-spacing: 0%;
-    margin-bottom: 1.5vh; /* changed from 25px */
+    margin-bottom: 1.5vh;
+    margin-top: 0; /* changed from 25px */
 }
 
 .main_text2 {

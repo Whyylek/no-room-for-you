@@ -39,7 +39,11 @@ window.addEventListener('DOMContentLoaded', async function () {
     const numPlayers = dbData.numPlayers || 6;
     const mainContainer = document.querySelector('.main-fifth');
     const modalContainer = document.getElementById('modalContainer');
-
+    dbData.otherPlayers.forEach(player => {
+        if (typeof player.backpack === 'string') {
+            player.backpack = player.backpack.split(',').map(item => item.trim());
+        }
+    });
     // Оновлюємо модальне вікно користувача з даними з БД
     const playerModalHtml = `
     <div class="modal" id="playerModal">
@@ -51,33 +55,33 @@ window.addEventListener('DOMContentLoaded', async function () {
             </div>
             <ul class="player-info">
                 <li>
-                        <input type="radio" id="gender" name="playerInfo">
-                        <label for="gender" class="yellow">Стать: <span>${dbData.playerInfo.gender} (${dbData.playerInfo.childfreeStatus})</span></label>
-                    </li>
-                    <li>
-                        <input type="radio" id="age" name="playerInfo">
-                        <label for="age">Вік: <span>${dbData.playerInfo.age}</span></label>
-                    </li>
-                    <li>
-                        <input type="radio" id="profession" name="playerInfo">
-                        <label for="profession">Професія: <span>${dbData.playerInfo.profession}</span></label>
-                    </li>
-                    <li>
-                        <input type="radio" id="health" name="playerInfo">
-                        <label for="health">Стан здоров'я: <span>${dbData.playerInfo.health}</span></label>
-                    </li>
-                    <li>
-                        <input type="radio" id="skills" name="playerInfo">
-                        <label for="skills">Навички: <span>${dbData.playerInfo.skill}</span></label>
-                    </li>
-                    <li>
-                        <input type="radio" id="items" name="playerInfo">
-                        <label for="items">Предмети в рюкзаку: <span>${dbData.playerInfo.backpack}</span></label>
-                    </li>
-                    <li>
-                        <input type="radio" id="flaws" name="playerInfo">
-                        <label for="flaws">Вади: <span>${dbData.playerInfo.flaw}</span></label>
-                    </li>
+                                          <input type="radio" id="gender" name="playerInfo">
+                     <label for="gender" class="yellow">Стать: <span>${dbData.playerInfo.gender} (${dbData.playerInfo.childfreeStatus})</span></label>
+                 </li>
+                 <li>
+                     <input type="radio" id="age" name="playerInfo">
+                     <label for="age">Вік: <span>${dbData.playerInfo.age}</span></label>
+                 </li>
+                 <li>
+                     <input type="radio" id="profession" name="playerInfo">
+                     <label for="profession">Професія: <span>${dbData.playerInfo.profession}</span></label>
+                 </li>
+                 <li>
+                     <input type="radio" id="health" name="playerInfo">
+                     <label for="health">Стан здоров'я: <span>${dbData.playerInfo.health}</span></label>
+                 </li>
+                 <li>
+                     <input type="radio" id="skills" name="playerInfo">
+                     <label for="skills">Навички: <span>${dbData.playerInfo.skill}</span></label>
+                 </li>
+                 <li>
+                     <input type="radio" id="items" name="playerInfo">
+                     <label for="items">Предмети в рюкзаку: <span>${dbData.playerInfo.backpack}</span></label>
+                 </li>
+                 <li>
+                     <input type="radio" id="flaws" name="playerInfo">
+                     <label for="flaws">Вади: <span>${dbData.playerInfo.flaw}</span></label>
+                 </li>
             </ul>
             <button id="confirmSelection" class="confirm-btn">Підтвердити</button>
         </div>
@@ -93,7 +97,7 @@ window.addEventListener('DOMContentLoaded', async function () {
                 <button class="modal-close" id="closeModal${index + 1}">✖</button>
                 <h2 class="kartka">КАРТКА:</h2>
                 <div class="player-header-container">
-                    <h3>Гравець ${index + 1}</h3>
+                     <h3>${player.nickname}</h3>
                 </div>
                 <ul class="player-info player-info-other">
                     <li>Стать: <span>${player.gender} (${player.childfreeStatus})</span></li>
@@ -129,7 +133,8 @@ window.addEventListener('DOMContentLoaded', async function () {
     html += '<div class="up-and-down">';
     html += '<div class="up-players">';
     for (let i = 1; i <= config.top; i++) {
-        html += `<div class="player-up"><button class="player-circle" id="player${i}"></button><span class="player-name">Гравець ${i}</span></div>`;
+        const player = dbData.otherPlayers[i - 1];
+         html += `<div class="player-up"><button class="player-circle" id="player${i}"></button><span class="player-name">${player?.nickname || 'Гравець ' + i}</span></div>`;
     }
     html += '</div>';
     html += '</div>';
@@ -138,7 +143,8 @@ window.addEventListener('DOMContentLoaded', async function () {
     html += '<div class="left-and-right">';
     html += '<div class="side-players">';
     for (let i = config.top + 1; i <= config.top + config.sides; i++) {
-        html += `<div class="player-left"><button class="player-circle" id="player${i}"></button><span class="player-name">Гравець ${i}</span></div>`;
+        const player = dbData.otherPlayers[i - 1];
+         html += `<div class="player-left"><button class="player-circle" id="player${i}"></button><span class="player-name">${player?.nickname || 'Гравець ' + i}</span></div>`;
     }
     html += '</div><div class="side-players">';
     for (let i = config.top + config.sides + 1; i <= numPlayers - 1; i++) {
@@ -226,7 +232,7 @@ const startVoteButton = document.getElementById('startVoteButton');
             votingOptionsHtml += `
                 <div class="vote-option">
                     <input type="radio" id="vote-player${i}" name="vote" value="${i}">
-                    <label for="vote-player${i}">Гравець ${i}</label>
+                    <label for="vote-player${i}">${dbData.otherPlayers[i - 1]?.nickname || `Гравець ${i}`}</label>
                 </div>
             `;
         }

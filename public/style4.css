@@ -141,34 +141,31 @@ body {
     overflow: hidden;
   }
 .main{
-    padding-top: 23vh;
-    padding-bottom: 11vh;
+    padding-top: 15vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8vh;
+    /* gap: 8vh; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.text1,.text2{
+.text1{
     text-shadow: 0px 20px 5px rgba(32, 32, 53, 1);
     text-align: center;
     user-select: none;
+    height: 165px;
+    margin-bottom: 9vh;
+    padding-inline: 70px;
 }
 .text1 h2{
-  font-size: 50px;
+  font-size: 40px;
   color: rgba(241, 206, 221, 1);
   font-family: 'Exo 2', sans-serif; 
   font-weight: 600;
   line-height: 54px;
-  padding-inline: 30px;
-}
-
-.text2 h2{
-    font-size: 50px;
-    color: rgba(241, 206, 221, 1);
-    font-family: 'Exo 2', sans-serif; 
-    font-weight: 600;
-    line-height: 54px; 
+  /* padding-inline: 60px; */
 }
 
 .button{
@@ -210,10 +207,8 @@ button{
 
 
 p{
-    width: 220px;
-    height: 80px;
     font-family: 'Exo 2', sans-serif; 
-    font-size: 40px;
+    font-size: 35px;
     font-weight: 600;
     line-height: 72px;
     text-align: center;
@@ -225,9 +220,37 @@ p{
 
 
 .choose-history{
+    margin-bottom: 5vh;
     display: flex;
     flex-direction: row;
     align-items: center;
+    gap: 10px; 
+}
+.a{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 12vh;
+}
+.container_history{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 74px;
+    width: 420px;
+    background: radial-gradient(50% 50% at 50% 50%, #FA4794 0.6%, #D73E80 22.1%, #B5356C 40.6%, #81284E 68.6%, #6F2344 84.6%, #6F2344 99.1%);
+    border-radius: 50px;
+    line-height: 100%;
+    letter-spacing: 0%;
 }
 
+.name{
+    font-weight: 600;
+    font-size: 30px;
+    font-weight: 800;
+    color: rgba(241, 206, 221, 1);
+    font-family: 'Exo 2', sans-serif; 
+    /* text-transform: uppercase; */
+    user-select: none;
+}
 

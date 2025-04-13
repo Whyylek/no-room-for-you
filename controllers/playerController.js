@@ -1,4 +1,4 @@
-
+const { flatMap } = require('lodash');
 const db = require('../db/db');
 const { generateCardWithBackpack, loadDataFromDB } = require('./cardGenerator');
 
@@ -24,14 +24,14 @@ exports.savePlayerData = async (req, res) => {
     }
 };
 
-
 exports.getPlayerData = async (req, res) => {
     try {
         const pool = db();
 
         // Отримуємо кількість гравців з таблиці `room`
-        const [roomRows] = await pool.execute('SELECT player_number FROM room ORDER BY room_id DESC LIMIT 1');
+        const [roomRows] = await pool.execute('SELECT room_id, player_number FROM room ORDER BY room_id DESC LIMIT 1');
         const numPlayers = roomRows.length > 0 ? parseInt(roomRows[0].player_number) : 6;
+        const room_id = roomRows.length > 0 ? roomRows[0].room_id : null;
 
         // Отримуємо ID головного гравця з query параметрів
         const player_id = req.query.player_id;
@@ -46,122 +46,213 @@ exports.getPlayerData = async (req, res) => {
         }
         const mainPlayer = mainPlayerRow[0];
 
+        
+
         // Завантажуємо дані для генерації карток
-        const professions = await loadDataFromDB(pool, 'job', 'job');
-        const skills = await loadDataFromDB(pool, 'hobby', 'hobby');
-        const healthConditions = await loadDataFromDB(pool, 'health', 'health');
-        const flaws = await loadDataFromDB(pool, 'vada', 'vada');
-        const backpackItems = await loadDataFromDB(pool, 'items', 'items');
+        const [professions] = await pool.execute('SELECT * FROM job');
+        const [skills] = await pool.execute('SELECT * FROM hobby');
+        const [healthConditions] = await pool.execute('SELECT * FROM health');
+        const [flaws] = await pool.execute('SELECT * FROM vada');
+        const [backpackItems] = await pool.execute('SELECT * FROM items');
 
-        // Генеруємо характеристики головного гравця, але nickname беремо з бази даних
-        const mainCard = generateCardWithBackpack(professions, skills, healthConditions, flaws, backpackItems);
-        mainCard.nickname = mainPlayer.nickname; // nickname береться з бази даних
-
-        // Отримуємо ID для головного гравця
-        const [jobRow] = await pool.execute('SELECT job_id FROM job WHERE job = ?', [mainCard.profession]);
-        const [hobbyRow] = await pool.execute('SELECT hobby_id FROM hobby WHERE hobby = ?', [mainCard.skill]);
-        const [healthRow] = await pool.execute('SELECT health_id FROM health WHERE health = ?', [mainCard.health]);
-        const [flawRow] = await pool.execute('SELECT vada_id FROM vada WHERE vada = ?', [mainCard.flaw]);
-        const [itemRows] = await pool.execute('SELECT items_id FROM items WHERE items IN (?)', [mainCard.backpack]);
-
-        const job_id = jobRow.length > 0 ? jobRow[0].job_id : null;
-        const hobby_id = hobbyRow.length > 0 ? hobbyRow[0].hobby_id : null;
-        const health_id = healthRow.length > 0 ? healthRow[0].health_id : null;
-        const vada_id = flawRow.length > 0 ? flawRow[0].vada_id : null;
-        const items_ids = itemRows.map(row => row.items_id);
-
-        // Отримуємо останню кімнату
-        const [roomRow] = await pool.execute('SELECT room_id FROM room ORDER BY room_id DESC LIMIT 1');
-        const room_id = roomRow.length > 0 ? roomRow[0].room_id : null;
-
-        // Вставляємо або оновлюємо дані головного гравця у таблиці `player`
+        // Генеруємо характеристики головного гравця (якщо їх немає в БД)
+       // Після отримання mainPlayer з БД:
+        let mainCard = generateCardWithBackpack(professions, skills, healthConditions, flaws, backpackItems);
+        mainPlayer.job_id = mainCard.profession.job_id;
+        mainPlayer.hobby_id = mainCard.skill.hobby_id;
+        mainPlayer.health_id = mainCard.health.health_id || mainCard.health;
+        mainPlayer.vada_id = mainCard.flaw.vada_id || mainCard.flaw;
+        mainPlayer.items_id = (mainCard.backpack.map((item)=>item.items_id)).join(',');
+        mainPlayer.age = mainCard.age;
+        mainPlayer.gender = mainCard.gender;
+        mainPlayer.childfreeStatus = mainCard.childfreeStatus;
+        console.log(mainCard);
+        console.log(mainPlayer);
+        // Якщо job_id немає - згенерувати нову професію
+        // if (!mainPlayer.job_id) {
+        //     const randomJob = professions[Math.floor(Math.random() * professions.length)].job;
+        //     mainCard.profession = randomJob;
+        //     // Оновлення job_id в БД
+        //     const [jobRow] = await pool.execute('SELECT job_id FROM job WHERE job = ?', [randomJob]);
+        //     mainPlayer.job_id = jobRow[0]?.job_id;
+        // }
+        
+        // // Аналогічно для інших полів:
+        // if (!mainPlayer.hobby_id) {
+        //     const randomSkill = skills[Math.floor(Math.random() * skills.length)].hobby;
+        //     mainCard.skill = randomSkill;
+        //     const [hobbyRow] = await pool.execute('SELECT hobby_id FROM hobby WHERE hobby = ?', [randomSkill]);
+        //     mainPlayer.hobby_id = hobbyRow[0]?.hobby_id;
+        // }
+        
+        // if (!mainPlayer.health_id) {
+        //     const randomHealth = healthConditions[Math.floor(Math.random() * healthConditions.length)].health;
+        //     mainCard.health = randomHealth;
+        //     const [healthRow] = await pool.execute('SELECT health_id FROM health WHERE health = ?', [randomHealth]);
+        //     mainPlayer.health_id = healthRow[0]?.health_id;
+        // }
+        
+        // if (!mainPlayer.vada_id) {
+        //     const randomFlaw = flaws[Math.floor(Math.random() * flaws.length)].vada;
+        //     mainCard.flaw = randomFlaw;
+        //     const [flawRow] = await pool.execute('SELECT vada_id FROM vada WHERE vada = ?', [randomFlaw]);
+        //     mainPlayer.vada_id = flawRow[0]?.vada_id;
+        // }
+        
+        // // Генерація предметів, якщо items_id відсутній
+        // if (!mainPlayer.items_id) {
+        //     const randomItems = backpackItems
+        //         .sort(() => 0.5 - Math.random())
+        //         .slice(0, 3)
+        //         .map(item => item.items);
+        //     mainCard.backpack = randomItems;
+        //     const itemIds = randomItems.map(item => 
+        //         backpackItems.find(i => i.items === item).items_id
+        //     );
+        //     mainPlayer.items_id = itemIds.join(',');
+        // }
+        
+        // Оновлення даних гравця в БД
         await pool.execute(
-            `
-            INSERT INTO player (
-                player_id, nickname, age, gender, childfreeStatus, color, room_id, job_id, hobby_id, health_id, vada_id, items_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-                age = VALUES(age),
-                gender = VALUES(gender),
-                childfreeStatus = VALUES(childfreeStatus),
-                room_id = VALUES(room_id),
-                job_id = VALUES(job_id),
-                hobby_id = VALUES(hobby_id),
-                health_id = VALUES(health_id),
-                vada_id = VALUES(vada_id),
-                items_id = VALUES(items_id)
-            `,
+            `UPDATE player SET 
+                age = ?,
+                gender = ?,
+                childfreeStatus = ?,
+                job_id = ?, 
+                hobby_id = ?, 
+                health_id = ?, 
+                vada_id = ?, 
+                items_id = ?
+            WHERE player_id = ?`,
             [
-                player_id,
-                mainPlayer.nickname, // nickname береться з бази даних
-                mainCard.age,
-                mainCard.gender,
-                mainCard.childfreeStatus,
-                '#FFFFFF', // Колір за замовчуванням (не оновлюється)
-                room_id,
-                job_id,
-                hobby_id,
-                health_id,
-                vada_id,
-                items_ids.join(',')
+                mainPlayer.age,
+                mainPlayer.gender,
+                mainPlayer.childfreeStatus,
+                mainPlayer.job_id,
+                mainPlayer.hobby_id,
+                mainPlayer.health_id,
+                mainPlayer.vada_id,
+                mainPlayer.items_id,
+                player_id
             ]
         );
 
-        // Генеруємо картки інших гравців (numPlayers - 1)
-        const cards = [];
-        for (let i = 0; i < numPlayers - 1; i++) {
-            const card = generateCardWithBackpack(professions, skills, healthConditions, flaws, backpackItems);
-            cards.push(card);
+        // Отримуємо дані з пов'язаних таблиць для головного гравця
+        if (mainPlayer.job_id) {
+            const [jobRow] = await pool.execute('SELECT job FROM job WHERE job_id = ?', [mainPlayer.job_id]);
+            mainCard.profession = jobRow[0]?.job || '';
+        }
+        if (mainPlayer.hobby_id) {
+            const [hobbyRow] = await pool.execute('SELECT hobby FROM hobby WHERE hobby_id = ?', [mainPlayer.hobby_id]);
+            mainCard.skill = hobbyRow[0]?.hobby || '';
+        }
+        if (mainPlayer.health_id) {
+            const [healthRow] = await pool.execute('SELECT health FROM health WHERE health_id = ?', [mainPlayer.health_id]);
+            mainCard.health = healthRow[0]?.health || '';
+        }
+        if (mainPlayer.vada_id) {
+            const [flawRow] = await pool.execute('SELECT vada FROM vada WHERE vada_id = ?', [mainPlayer.vada_id]);
+            mainCard.flaw = flawRow[0]?.vada || '';
+        }
+        if (mainPlayer.items_id) {
+            const itemIds = mainPlayer.items_id;//.split(',').map(item => parseInt(item));
+            console.log(itemIds);
+            const [itemsRow] = await pool.execute('SELECT items FROM items WHERE items_id IN (?)', [itemIds]);
+            mainCard.backpack = itemsRow.map(item => item.items);
+            console.log(mainCard.backpack);
+        }
 
-            // Зберігаємо характеристики гравця у таблиці `player`
-            const [jobRow] = await pool.execute('SELECT job_id FROM job WHERE job = ?', [card.profession]);
-            const [hobbyRow] = await pool.execute('SELECT hobby_id FROM hobby WHERE hobby = ?', [card.skill]);
-            const [healthRow] = await pool.execute('SELECT health_id FROM health WHERE health = ?', [card.health]);
-            const [flawRow] = await pool.execute('SELECT vada_id FROM vada WHERE vada = ?', [card.flaw]);
-            const [itemRows] = await pool.execute('SELECT items_id FROM items WHERE items IN (?)', [card.backpack]);
+        // Отримуємо всіх інших гравців з поточної кімнати
+        const [otherPlayersRows] = await pool.execute(`
+            SELECT p.*, 
+                   j.job AS profession, 
+                   h.hobby AS skill, 
+                   he.health, 
+                   v.vada AS flaw,
+                   GROUP_CONCAT(i.items) AS backpack
+            FROM player p
+            LEFT JOIN job j ON p.job_id = j.job_id
+            LEFT JOIN hobby h ON p.hobby_id = h.hobby_id
+            LEFT JOIN health he ON p.health_id = he.health_id
+            LEFT JOIN vada v ON p.vada_id = v.vada_id
+            LEFT JOIN items i ON FIND_IN_SET(i.items_id, p.items_id)
+            WHERE p.room_id = ? AND p.player_id != ?
+            GROUP BY p.player_id
+        `, [room_id, player_id]);
 
-            const job_id = jobRow.length > 0 ? jobRow[0].job_id : null;
-            const hobby_id = hobbyRow.length > 0 ? hobbyRow[0].hobby_id : null;
-            const health_id = healthRow.length > 0 ? healthRow[0].health_id : null;
-            const vada_id = flawRow.length > 0 ? flawRow[0].vada_id : null;
-            const items_ids = itemRows.map(row => row.items_id);
+        let otherPlayers = otherPlayersRows.map(player => ({
+            nickname: player.nickname,
+            age: player.age,
+            gender: player.gender,
+            childfreeStatus: player.childfreeStatus,
+            profession: player.profession,
+            skill: player.skill,
+            health: player.health,
+            flaw: player.flaw,
+            backpack: player.backpack ? player.backpack.split(',') : []
+        }));
 
-            const [roomRow] = await pool.execute('SELECT room_id FROM room ORDER BY room_id DESC LIMIT 1');
-            const room_id = roomRow.length > 0 ? roomRow[0].room_id : null;
+        // Якщо кількість інших гравців менша за необхідну, генеруємо нових
+        const requiredOtherPlayers = numPlayers - 1;
+        if (otherPlayers.length < requiredOtherPlayers) {
+            const toGenerate = requiredOtherPlayers - otherPlayers.length;
+            for (let i = 0; i < toGenerate; i++) {
+                const newCard = generateCardWithBackpack(
+                    professions.map(p => p.job),
+                    skills.map(s => s.hobby),
+                    healthConditions.map(h => h.health),
+                    flaws.map(f => f.vada),
+                    backpackItems.map(b => b.items)
+                );
+            
+                // Ensure all required fields are present (add defaults if necessary)
+                newCard.age = newCard.age ?? 0; // Default age to 0 if missing
+                newCard.gender = newCard.gender ?? 'Unknown'; // Default gender
+                newCard.childfreeStatus = newCard.childfreeStatus ?? 'No'; // Default childfree status
 
-            await pool.execute(
-                'INSERT INTO player (nickname, age, gender, childfreeStatus, color, room_id, job_id, hobby_id, health_id, vada_id, items_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [
-                    card.nickname || `Гравець ${i + 1}`,
-                    card.age,
-                    card.gender,
-                    card.childfreeStatus,
-                    '#FFFFFF',
-                    room_id,
-                    job_id,
-                    hobby_id,
-                    health_id,
-                    vada_id,
-                    items_ids.join(',')
-                ]
-            );
+
+                // Зберігаємо нового гравця в БД
+                const [jobRow] = await pool.execute('SELECT job_id FROM job WHERE job = ?', [newCard.profession]);
+                const job_id = jobRow.length ? jobRow[0].job_id : null;
+
+                const [hobbyRow] = await pool.execute('SELECT hobby_id FROM hobby WHERE hobby = ?', [newCard.skill]);
+                const hobby_id = hobbyRow.length ? hobbyRow[0].hobby_id : null;
+
+                const [healthRow] = await pool.execute('SELECT health_id FROM health WHERE health = ?', [newCard.health]);
+                const health_id = healthRow.length ? healthRow[0].health_id : null;
+
+                const [flawRow] = await pool.execute('SELECT vada_id FROM vada WHERE vada = ?', [newCard.flaw]);
+                const vada_id = flawRow.length ? flawRow[0].vada_id : null;
+
+                const [itemRows] = await pool.execute('SELECT items_id FROM items WHERE items IN (?)', [newCard.backpack]);
+                // Під час генерації нового гравця:
+                const items_ids = itemRows?.map(row => row.items_id).join(',') || '';
+
+                await pool.execute(
+                    'INSERT INTO player (nickname, age, gender, childfreeStatus, color, room_id, job_id, hobby_id, health_id, vada_id, items_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    [
+                        newCard.nickname || `Гравець ${i + 1}`, // Fallback nickname
+                        newCard.age, // Now guaranteed to be defined
+                        newCard.gender, // Now guaranteed to be defined
+                        newCard.childfreeStatus, // Now guaranteed to be defined
+                        '#FFFFFF',
+                        room_id,
+                        job_id,
+                        hobby_id,
+                        health_id,
+                        vada_id,
+                        items_ids
+                    ]
+                );
+                otherPlayers.push(newCard);
+            }
         }
 
         // Повертаємо дані
         return res.status(200).json({
             numPlayers,
-            playerInfo: {
-                nickname: mainPlayer.nickname, // nickname з бази даних
-                age: mainCard.age,
-                gender: mainCard.gender,
-                childfreeStatus: mainCard.childfreeStatus,
-                profession: mainCard.profession,
-                skill: mainCard.skill,
-                health: mainCard.health,
-                flaw: mainCard.flaw,
-                backpack: mainCard.backpack
-            },
-            otherPlayers: cards
+            playerInfo: mainCard,
+            otherPlayers: otherPlayers
         });
     } catch (error) {
         console.error('Помилка при отриманні даних гравців:', error);

@@ -185,21 +185,75 @@ body {
     border-radius: 20px;
     
   }
-  .winners{
-    border: 1px solid rgba(250, 71, 148, 1);
-    border-radius: 20px;
-    width: 371px;
-    height: 232px;
-  }
-  .player{
-    font-size: 32px;
-    font-family: 'Exo 2', sans-serif; 
+  
+.winners{
+  display: flex;
+  border: 1px solid rgba(250, 71, 148, 1);
+  border-radius: 20px;
+  width: 371px;
+  height: 232px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Центруємо елементи */
+  gap: 20px;
+  padding: 20px;
+}
+
+.player {
+    font-size: 28px;
+    font-family: 'Exo 2', sans-serif;
     font-weight: 600;
     color: rgba(186, 91, 132, 1);
     list-style-type: none;
-    margin-block: 22px;
     text-align: center;
-  }
+    transition: all 0.3s ease;
+    width: 100%; /* За замовчуванням елемент займає всю ширину */
+}
+
+/* Клас для 3 переможців */
+.winners.three-players .player {
+    width: 50%; /* Вони займають 3 місця в одному ряді */
+}
+
+/* Клас для 4 переможців (2 ряди по 2) */
+.winners.four-players .player {
+    width: 45%;
+    margin-block: 13px; 
+}
+
+/* Клас для 5 переможців (4 в 2 ряди, 5-й в центрі) */
+.winners.five-players {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.winners.five-players .player:nth-child(5) {
+    width: 40%; /* 5-й елемент в центрі */
+    margin-top: 10px; /* Додатковий відступ для центрування */
+}
+
+.winners.five-players .player:nth-child(1),
+.winners.five-players .player:nth-child(2),
+.winners.five-players .player:nth-child(3),
+.winners.five-players .player:nth-child(4) {
+    width: 45%; /* Перші чотири елементи йдуть по двоє в ряд */
+}
+
+/* Клас для 6 переможців (3 ряди по 2) */
+.winners.six-players .player {
+    width: 45%; /* Кожен елемент займає 45% ширини */
+}
+
+/* Додаткові налаштування для адаптивності */
+@media (max-width: 768px) {
+    .winners .player {
+        width: 100%; /* Для малих екранів всі елементи йдуть в один ряд */
+    }
+}
+
+
 
 .text{
     font-family: 'Exo 2', sans-serif;
