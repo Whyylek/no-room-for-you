@@ -1,6 +1,9 @@
 
 // Socket.IO підключення
-const socket = io('https://no-room-for-you.vercel.app');
+
+const socket = io('https://no-room-for-you.vercel.app', {
+    transports: ['websocket']
+  });
 const room_code = sessionStorage.getItem('room_code');
 const player_id = sessionStorage.getItem('player_id');
 const isHost = sessionStorage.getItem('is_host') === 'true';
