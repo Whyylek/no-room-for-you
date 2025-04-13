@@ -1,6 +1,6 @@
 
 // Socket.IO підключення
-const socket = io('http://localhost:3000');
+const socket = io('https://no-room-for-you.vercel.app');
 const room_code = sessionStorage.getItem('room_code');
 const player_id = sessionStorage.getItem('player_id');
 const isHost = sessionStorage.getItem('is_host') === 'true';
