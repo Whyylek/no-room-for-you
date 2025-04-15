@@ -161,7 +161,7 @@ function sendRoomUpdate(room_code, rows) {
 // ⛓️ Підключення БД
 
 
-const cors = require('cors');
+
 
 app.use(cors({
   origin: [
