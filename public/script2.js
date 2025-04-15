@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const nicknameSpan = document.getElementById("nickname");
 
     const player_id = sessionStorage.getItem('player_id');
-    fetch(`https://no-room-for-you.herokuapp.com/api/get-nickname/${player_id}`)
+    fetch(`https://no-room-for-you-f8419decc423.herokuapp.com/api/get-nickname/${player_id}`)
         .then(response => {
             if (!response.ok) throw new Error('Помилка сервера');
             return response.json();
@@ -68,7 +68,7 @@ submitBtn.addEventListener("click", () => {
 
     modalMessage.textContent = '';
 
-    fetch('https://no-room-for-you.herokuapp.com/api/find-room', {
+    fetch('https://no-room-for-you-f8419decc423.herokuapp.com/api/find-room', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ submitBtn.addEventListener("click", () => {
 
 async function createRoom(playerNumber, roomCode) {
     try {
-      const response = await fetch('https://no-room-for-you.herokuapp.com/api/create-room', {
+      const response = await fetch('https://no-room-for-you-f8419decc423.herokuapp.com/api/create-room', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
