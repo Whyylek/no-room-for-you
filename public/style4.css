@@ -246,11 +246,10 @@ p{
 
 .name{
     font-weight: 600;
-    font-size: 30px;
-    font-weight: 800;
+    font-size: 2.5em;
     color: rgba(241, 206, 221, 1);
-    font-family: 'Exo 2', sans-serif; 
-    /* text-transform: uppercase; */
+    font-family: 'Exo 2', sans-serif;
+    text-shadow: 1px 1px 5px white;
     user-select: none;
 }
 

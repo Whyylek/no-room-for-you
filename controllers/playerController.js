@@ -137,6 +137,8 @@ exports.getPlayerData = async (req, res) => {
             ]
         );
 
+        const [playerColor] = await pool.execute('SELECT color FROM player WHERE player_id = ?', [player_id]);
+
         // Отримуємо дані з пов'язаних таблиць для головного гравця
         if (mainPlayer.job_id) {
             const [jobRow] = await pool.execute('SELECT job FROM job WHERE job_id = ?', [mainPlayer.job_id]);
@@ -155,9 +157,11 @@ exports.getPlayerData = async (req, res) => {
             mainCard.flaw = flawRow[0]?.vada || '';
         }
         if (mainPlayer.items_id) {
-            const itemIds = mainPlayer.items_id;//.split(',').map(item => parseInt(item));
+            const itemIds = mainPlayer.items_id.split(',').map(id => parseInt(id.trim()));
             console.log(itemIds);
-            const [itemsRow] = await pool.execute('SELECT items FROM items WHERE items_id IN (?)', [itemIds]);
+            const placeholders = itemIds.map(() => '?').join(',');
+            const query = `SELECT items FROM items WHERE items_id IN (${placeholders})`;
+            const [itemsRow] = await pool.execute(query, itemIds);
             mainCard.backpack = itemsRow.map(item => item.items);
             console.log(mainCard.backpack);
         }
@@ -181,6 +185,7 @@ exports.getPlayerData = async (req, res) => {
         `, [room_id, player_id]);
 
         let otherPlayers = otherPlayersRows.map(player => ({
+            player_id: player.player_id,
             nickname: player.nickname,
             age: player.age,
             gender: player.gender,
@@ -189,7 +194,8 @@ exports.getPlayerData = async (req, res) => {
             skill: player.skill,
             health: player.health,
             flaw: player.flaw,
-            backpack: player.backpack ? player.backpack.split(',') : []
+            backpack: player.backpack ? player.backpack.split(',') : [],
+            color: player.color
         }));
 
         // Якщо кількість інших гравців менша за необхідну, генеруємо нових
@@ -249,6 +255,7 @@ exports.getPlayerData = async (req, res) => {
         }
 
         // Повертаємо дані
+        mainCard.color = playerColor[0].color;
         return res.status(200).json({
             numPlayers,
             playerInfo: mainCard,

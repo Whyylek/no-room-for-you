@@ -1,9 +1,6 @@
 
 // Socket.IO підключення
-
-const socket = io('https://no-room-for-you.vercel.app', {
-    transports: ['websocket']
-  });
+const socket = io('https://no-room-for-you.vercel.app');
 const room_code = sessionStorage.getItem('room_code');
 const player_id = sessionStorage.getItem('player_id');
 const isHost = sessionStorage.getItem('is_host') === 'true';
@@ -183,4 +180,16 @@ document.querySelector('.button2').addEventListener('click', function () {
     setTimeout(function () {
         message.style.display = 'none';
     }, 2000);
+});
+
+const openBtnRules = document.getElementById("openModal");
+const closeBtnRules = document.getElementById("closeModal");
+const modalRules = document.getElementById("modal");
+
+openBtnRules.addEventListener("click", () => {
+    modalRules.classList.add("open");
+});
+
+closeBtnRules.addEventListener("click", () => {
+    modalRules.classList.remove("open");
 });

@@ -65,7 +65,7 @@ exports.updateRoom = async (req, res) => {
         
         const existingRoom = await getRoomByCode(room_code);
         if (!existingRoom) {
-            return res.status(404).json({ error: 'Кімнату не знайдено' });
+            return res.status(404).json({ error: 'Кімнату не знайдено.' });
         }
         
         await pool.execute(
@@ -75,12 +75,12 @@ exports.updateRoom = async (req, res) => {
         
         res.json({ 
             success: true, 
-            message: 'Кімнату оновлено', 
+            message: 'Кімнату оновлено.', 
             room_code 
         });
     } catch (error) {
         console.error('Помилка при оновленні кімнати:', error);
-        res.status(500).json({ error: 'Помилка сервера' });
+        res.status(500).json({ error: 'Помилка сервера.' });
     }
 };
 exports.findRoom = async (req, res) => {

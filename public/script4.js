@@ -34,9 +34,9 @@ const player_id = sessionStorage.getItem('player_id');
             })
             .catch(error => {
                 console.error('Помилка при завантаженні історії:', error);
-                document.getElementById('history-title').innerHTML = 'Помилка при завантаженні історії';
+                document.getElementById('history-title').innerHTML = 'Помилка при завантаженні історії.';
                 document.getElementById('history-subtitle').style.display = 'none';
-                document.getElementById('story-name').innerHTML = 'Номер історії недоступний';
+                document.getElementById('story-name').innerHTML = 'Номер історії недоступний.';
             });
     }
 

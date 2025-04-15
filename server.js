@@ -18,7 +18,60 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   console.log('🟢 Socket підключено:', socket.id);
   // Коли хост перегортає історії
+  socket.on('testConnection', function(data) {
+    console.log('Отримано тестове повідомлення:', data);
+    
+    // Відправляємо відповідь назад до кімнати
+    if (data.room_code) {
+        io.to(data.room_code).emit('testResponse', { 
+            success: true, 
+            message: 'Сервер отримав ваше повідомлення', 
+            originalData: data 
+        });
+    }
+});
+
+// Додаємо подію для явного приєднання до кімнати
+socket.on('joinGameRoom', function(data) {
+    if (data.room_code) {
+        socket.join(data.room_code);
+        console.log(`Гравець приєднався до кімнати: ${data.room_code}`);
+        
+        // Підтверджуємо приєднання
+        socket.emit('roomJoined', { 
+            success: true, 
+            room_code: data.room_code 
+        });
+    }
+});
+// Обробник події "вигнати гравця"
+// Обробник події "вигнати гравця"
+socket.on('kickPlayer', async ({ room_code, playerId }) => {
+  console.log(`❌ Хост вигнав гравця з ID ${playerId} з кімнати ${room_code}`);
   
+  // Передаємо всім гравцям у кімнаті інформацію про вигнаного гравця
+  io.to(room_code).emit('playerKicked', { playerId });
+
+  // // Оновлюємо список гравців у кімнаті (якщо потрібно)
+  // const pool = db();
+  // const [rows] = await pool.execute(
+  //   'SELECT player_id, nickname, color FROM player JOIN room ON player.room_id = room.room_id WHERE room_code = ?',
+  //   [room_code]
+  // );
+  // sendRoomUpdate(room_code, rows);
+});
+// Оновлюємо обробник відкриття атрибутів
+socket.on('revealAttribute', ({ playerId, attributeId, roomCode, playerNickname, attributeValue }) => {
+    console.log(`👀 Гравець ${playerId} (${playerNickname}) відкрив характеристику: ${attributeId} у кімнаті ${roomCode}`);
+
+    // Важливо використовувати io.to замість socket.to, щоб включити і відправника
+    io.to(roomCode).emit('updateAttributeVisibility', { 
+        playerId, 
+        attributeId, 
+        playerNickname, 
+        attributeValue 
+    });
+});
   // Коли хост перегортає історії
   socket.on('changeStory', ({ room_code, story_id }) => {
     console.log(`📚 Хост змінив історію: ${story_id} в кімнаті ${room_code}`);
@@ -33,11 +86,11 @@ io.on('connection', (socket) => {
     socket.to(room_code).emit('storyChosen');
   });
 
-// Обробка події startGame
-socket.on('startGame', ({ room_code }) => {
+  // Обробка події startGame
+  socket.on('startGame', ({ room_code }) => {
   console.log(`🎮 Гра почалася в кімнаті: ${room_code}`);
   io.to(room_code).emit('redirectPlayers'); // Повідомляємо всіх гравців про перенаправлення
-});
+  });
   socket.on('joinRoom', async ({ room_code, player_id }) => {
     if (!room_code || !player_id) return;
     const pool = db();

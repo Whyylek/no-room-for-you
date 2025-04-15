@@ -169,6 +169,8 @@ body {
 }
 
 .side-players{
+    color: rgba(241, 206, 221, 1);
+    text-shadow: 2px 2px 5px rgba(32, 32, 53, 1);
     display: flex;
     padding-inline:10px;
     flex-direction: column;
@@ -189,6 +191,8 @@ body {
 }
 
 .up-players {
+    color: rgba(241, 206, 221, 1);
+    text-shadow: 2px 2px 5px rgba(32, 32, 53, 1);
     display: flex;
     flex-direction: row;
     padding-top: 10px;
@@ -199,6 +203,8 @@ body {
 }
 
 .player {
+    color: rgba(241, 206, 221, 1);
+    text-shadow: 2px 2px 5px rgba(32, 32, 53, 1);
     position: absolute;
     bottom: 0;
     left: 50%;
@@ -243,6 +249,12 @@ body {
     box-shadow: 4px 7px 4px 0px #00000040 inset;
     cursor: pointer;
 }
+/* Стиль для затемнених гравців */
+.player-circle.kicked {
+  filter: grayscale(100%);
+  pointer-events: none; /* Забороняємо взаємодію */
+  opacity: 0.5; /* Зменшуємо прозорість */
+}
 
 .player-card {
     z-index: 3;
@@ -277,13 +289,12 @@ body {
     background: #BA5B84;
     border-radius: 20px;
     padding: 30px 20px;
-    width: 320px;
-    max-width: 90vw;
-    height: 55vh;
+    width: 380px;
+    height: 65vh;
     text-align: center;
     color: white;
     position: relative;
-    box-shadow: 0 0 10px rgba(212, 209, 14, 1);
+    box-shadow: 0 0 10px white;
 }
 
 .modal-close {
@@ -341,6 +352,7 @@ body {
 }
 
 .player-info input[type="radio"] {
+    flex-shrink: 0;
     appearance: none;
     width: 10px;
     height: 10px;
@@ -353,6 +365,7 @@ body {
 
 .player-info input[type="radio"]:checked {
     background: yellow;
+    flex-shrink: 0;
 }
 
 .player-info label {
@@ -360,16 +373,21 @@ body {
 }
 
 .confirm-btn {
-    background-color: #441D3A;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 15px;
-    width: 100%;
-    position: relative;
+  position: absolute;
+  bottom: -50px;
+  background-color: #702345;
+  color: rgba(241, 206, 221, 1);
+  border: none;
+  padding: 10px 20px;
+  font-size: 20px;
+  border-radius: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 53%;
+  height: 13%;
+  box-shadow: 0 0 10px rgba(241,206,221,0.3), inset 0 0 20px rgba(53,24,37,0.32);
+  text-shadow: 2px 2px 5px rgba(241, 206, 221, 0.2);
+  position: relative;
 }
 
 .confirm-btn:hover {
@@ -502,6 +520,7 @@ body {
 }
 
 .vote-option input[type="radio"] {
+    flex-shrink: 0;
     appearance: none;
     width: 15px;
     height: 15px;
@@ -513,6 +532,7 @@ body {
 }
 
 .vote-option input[type="radio"]:checked {
+    flex-shrink: 0;
     background: yellow;
     box-shadow: 0 0 5px yellow;
 }
@@ -679,7 +699,112 @@ body {
     background: none; /* Забирає фонове забарвлення */
     border: none;
   }
+
+  .player-info-other span{
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+ .hidden-attribute {
+       opacity: 0;
+       transition: opacity 0.3s ease;
+   }
+  .visible-attribute {
+      opacity: 1 !important;
+       transition: opacity 0.3s ease;
+   }
   /* .main{
     flex-direction: row;
   } */
   
+
+  #timerContainer {
+    display: flex;
+    align-items: center;
+    font-family: sans-serif;
+    position: fixed;
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem;
+    font-weight: 600;
+    top: 92%;
+    left: 2%;
+    padding: 1px;
+  }
+
+  #timer {
+    width: 113px;
+    color: rgb(255, 255, 255);
+  }
+
+  /* .button {
+    padding: 4px 8px;
+    margin-left: 8px;
+    font-size: 2rem;
+    cursor: pointer;
+    background-color: none;
+    border: none;
+    background: none;
+    padding: 1px;
+    margin: 0px;
+  } */
+
+.confirm-btn-vote{
+  position: absolute;
+  bottom: -50px;
+  background-color: #702345;
+  color: rgba(241, 206, 221, 1);
+  border: none;
+  padding: 10px 20px;
+  font-size: 20px;
+  border-radius: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 90%;
+  height: 13%;
+  box-shadow: 0 0 15px rgba(241,206,221,0.3), inset 0 0 20px rgba(53,24,37,0.32);
+  text-shadow: 2px 2px 5px rgba(241, 206, 221, 0.2);
+  position: relative;
+}
+
+.button {
+  height: 35px;
+  width: 35px;
+  background: #bb5a85;
+  border-radius: 50%;
+  border: none;
+  margin-left: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.trinagle{
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;    
+  border-bottom: 10px solid transparent; 
+  border-left: 15px solid #202035;
+  margin-left: 4px;
+}
+
+.circle {
+width: 28px;
+height: 28px;
+border-radius: 50%;
+border: 4px solid transparent;
+border-top-color: #202035;
+border-right-color: #202035;
+border-bottom-color: #202035;
+transform: rotate(130deg);
+position: absolute;
+}
+.trinagle2{
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;    
+  border-bottom: 7px solid transparent; 
+  border-left: 12px solid #202035;
+  position: absolute;
+  top:8px;
+  left:181px;
+}

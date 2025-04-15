@@ -26,10 +26,6 @@ const assignGender = () => {
     return Math.random() < 0.5 ? "Чоловік" : "Жінка";
 };
 
-// Визначення здоров'я
-const assignHealth = (healthConditions) => {
-    return Math.random() < 0.25 ? "Здоровий" : getRandomElement(healthConditions);
-};
 
 // Вибір кількох предметів з рюкзака
 const assignBackpackItems = (items, numItems = 2) => {
@@ -48,7 +44,7 @@ const generateCardWithBackpack = (professions, skills, healthConditions, flaws, 
     const gender = assignGender();
     const profession = getRandomElement(professions);
     const skill = getRandomElement(skills);
-    const health = assignHealth(healthConditions);
+    const health = Math.random() < 0.25 ? getRandomElement(healthConditions) : 'Здоровий';
     const flaw = Math.random() < 0.3 ? getRandomElement(flaws) : 'Без вад';
     const backpack = assignBackpackItems(backpackItems, getRandomInt(2, 3));
     const childfreeStatus = Math.random() < 0.15 ? "Childfree" : "З дітьми";
