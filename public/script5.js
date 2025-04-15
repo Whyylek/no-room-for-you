@@ -527,7 +527,7 @@ socket.on('timerStopped', function() {// Повідомляємо про зуп�
             span.style.opacity = '1';
             console.log('Зроблено видимим атрибут для себе');
 
-            // Відправляємо оновлення на сервер
+           
             socket.emit('revealAttribute', { 
                 playerId, 
                 attributeId, 
