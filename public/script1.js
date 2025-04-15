@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             
-                const response = await fetch('https://no-room-for-you.vercel.app/api/save-nickname', {
+                const response = await fetch('https://no-room-for-you.herokuapp.com/api/save-nickname', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
