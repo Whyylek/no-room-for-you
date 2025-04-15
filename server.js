@@ -7,14 +7,6 @@ const { Server } = require('socket.io');
 const db = require('./db/db');
 
 
-app.use(cors({
-  origin: [
-    'https://no-room-for-you-f8419decc423.herokuapp.com', // URL вашого Heroku-додатку
-    'http://localhost:3000' // Локальний URL для тестування
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Дозволені HTTP-методи
-  allowedHeaders: ['Content-Type', 'Authorization'] // Дозволені заголовки
-}));
 // 🔁 Ініціалізація Express + HTTP + Socket.IO
 const app = express();
 const server = http.createServer(app);
@@ -167,7 +159,16 @@ function sendRoomUpdate(room_code, rows) {
 }
 
 // ⛓️ Підключення БД
-app.use(cors());
+
+
+app.use(cors({
+  origin: [
+    'https://no-room-for-you-f8419decc423.herokuapp.com', // URL вашого Heroku-додатку
+    'http://localhost:3000' // Локальний URL для тестування
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Дозволені HTTP-методи
+  allowedHeaders: ['Content-Type', 'Authorization'] // Дозволені заголовки
+}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
