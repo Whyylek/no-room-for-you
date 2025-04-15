@@ -1,6 +1,6 @@
 
 // Socket.IO підключення
-const socket = io('https://no-room-for-you.herokuapp.com');
+const socket = io('https://no-room-for-you-f8419decc423.herokuapp.com');
 const room_code = sessionStorage.getItem('room_code');
 const player_id = sessionStorage.getItem('player_id');
 const isHost = sessionStorage.getItem('is_host') === 'true';
