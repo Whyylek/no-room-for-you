@@ -5,7 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const { Server } = require('socket.io');
 const db = require('./db/db');
-const cors = require('cors');
+
 
 app.use(cors({
   origin: [
