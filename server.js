@@ -161,6 +161,8 @@ function sendRoomUpdate(room_code, rows) {
 // ⛓️ Підключення БД
 
 
+const cors = require('cors');
+
 app.use(cors({
   origin: [
     'https://no-room-for-you-f8419decc423.herokuapp.com', // URL вашого Heroku-додатку
@@ -169,6 +171,9 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Дозволені HTTP-методи
   allowedHeaders: ['Content-Type', 'Authorization'] // Дозволені заголовки
 }));
+
+// Дозволяє OPTIONS-запити (preflight)
+app.options('*', cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
