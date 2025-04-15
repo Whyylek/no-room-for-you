@@ -6,7 +6,6 @@ const path = require('path');
 const { Server } = require('socket.io');
 const db = require('./db/db');
 
-
 // 🔁 Ініціалізація Express + HTTP + Socket.IO
 const app = express();
 const server = http.createServer(app);
@@ -15,7 +14,7 @@ const io = new Server(server, {
     origin: '*',
   }
 });
-
+const roomTimers = {}; // Об'єкт для зберігання часу кожної кімнати
 io.on('connection', (socket) => {
   console.log('🟢 Socket підключено:', socket.id);
   // Коли хост перегортає історії
@@ -62,16 +61,44 @@ socket.on('kickPlayer', async ({ room_code, playerId }) => {
   // sendRoomUpdate(room_code, rows);
 });
 // Оновлюємо обробник відкриття атрибутів
-socket.on('revealAttribute', ({ playerId, attributeId, roomCode, playerNickname, attributeValue }) => {
-    console.log(`👀 Гравець ${playerId} (${playerNickname}) відкрив характеристику: ${attributeId} у кімнаті ${roomCode}`);
-
-    // Важливо використовувати io.to замість socket.to, щоб включити і відправника
-    io.to(roomCode).emit('updateAttributeVisibility', { 
-        playerId, 
-        attributeId, 
-        playerNickname, 
-        attributeValue 
-    });
+// Оновлений інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код.інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код.інший
+socket.on('revealAttribute', async ({ playerId, attributeId, roomCode, playerNickname, attributeValue }) => {
+  console.log(`👀 Гравець ${playerId} (${playerNickname}) відкрив характеристику: ${attributeId} у кімнаті ${roomCode}`);
+  const pool = db();
+  
+  // Переведення атрибутів в назви колонок БД
+  switch(attributeId){
+      case 'profession': attributeId = 'job'; break;
+      case 'skills': attributeId = 'hobby'; break;
+      case 'flaws': attributeId = 'vada'; break;
+      case 'backpack': attributeId = 'items'; break;
+  }
+  
+  // Оновлення БД
+  await pool.execute(`UPDATE player_to_show SET ${attributeId} = ? WHERE player_id = ?`, [attributeValue, playerId]);
+  
+  // Отримання ВСІХ гравців у кімнаті (включаючи того, хто відкрив атрибут)
+  const [allPlayersCards] = await pool.execute(`
+      SELECT 
+          player.nickname, 
+          p.player_id, 
+          p.age, 
+          p.gender, 
+          p.color, 
+          p.job, 
+          p.hobby, 
+          p.health, 
+          p.vada, 
+          p.items 
+      FROM player_to_show AS p 
+      JOIN player ON p.player_id = player.player_id 
+      JOIN room ON player.room_id = room.room_id 
+      WHERE room_code = ?
+  `, [roomCode]);//ляємінший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код. Інший код.інший
+  // Відправка ВСІХ даних гравців у кімнаті
+  io.to(roomCode).emit('updateAttributeVisibility', { 
+      players: allPlayersCards // Тепер передаємо всіх гравців
+  });
 });
   // Коли хост перегортає історії
   socket.on('changeStory', ({ room_code, story_id }) => {
@@ -135,7 +162,6 @@ socket.on('revealAttribute', ({ playerId, attributeId, roomCode, playerNickname,
       const playerCount = players[0].count;
       socket.emit('playerCountResponse', { playerCount });
     });
-
     // Обробка відключення
     socket.on('disconnect', async () => {
       //await pool.execute('UPDATE player SET room_id = null WHERE player_id = ?', [player_id]);
@@ -145,6 +171,37 @@ socket.on('revealAttribute', ({ playerId, attributeId, roomCode, playerNickname,
       );
       sendRoomUpdate(room_code, rows);
     });
+  });
+    socket.on('startTimer', async ({ room_code }) => {
+      if (!roomTimers[room_code]) {
+          roomTimers[room_code] = 60; // Початковий час (60 секунд)
+      }
+
+      console.log(`⏳ Таймер запущено для кімнати: ${room_code}`);
+
+      // Запускаємо інтервал для оновлення часу
+      const intervalId = setInterval(async () => {
+          if (roomTimers[room_code] > 0) {
+              roomTimers[room_code]--;
+              io.to(room_code).emit('updateTimer', { timeLeft: roomTimers[room_code] });
+          } else {
+              clearInterval(intervalId); // Зупиняємо таймер
+              io.to(room_code).emit('timerFinished'); // Повідомляємо про завершення
+          }
+      }, 1000);
+
+      // Відправляємо початковий час всім гравцям у кімнаті
+      io.to(room_code).emit('updateTimer', { timeLeft: roomTimers[room_code] });
+  
+
+  // Обробник для зупинки таймера
+  socket.on('stopTimer', ({ room_code }) => {
+      if (roomTimers[room_code]) {
+          clearInterval(roomTimers[room_code]); // Зупиняємо інтервал
+          delete roomTimers[room_code]; // Видаляємо таймер для кімнати
+          io.to(room_code).emit('timerStopped'); // Повідомляємо про зупинку
+      }
+  });
   });
 });
 
@@ -157,11 +214,6 @@ function sendRoomUpdate(room_code, rows) {
     usedColors // Передаємо список зайнятих кольорів
   });
 }
-
-// ⛓️ Підключення БД
-
-
-
 
 app.use(cors({
   origin: [
@@ -208,3 +260,4 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Сервер запущено на порту ${PORT}`);
 });
+

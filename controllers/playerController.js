@@ -1,4 +1,3 @@
-const { flatMap } = require('lodash');
 const db = require('../db/db');
 const { generateCardWithBackpack, loadDataFromDB } = require('./cardGenerator');
 
@@ -138,6 +137,11 @@ exports.getPlayerData = async (req, res) => {
         );
 
         const [playerColor] = await pool.execute('SELECT color FROM player WHERE player_id = ?', [player_id]);
+        mainCard.color = playerColor[0].color;
+
+        
+
+        
 
         // Отримуємо дані з пов'язаних таблиць для головного гравця
         if (mainPlayer.job_id) {
@@ -165,6 +169,21 @@ exports.getPlayerData = async (req, res) => {
             mainCard.backpack = itemsRow.map(item => item.items);
             console.log(mainCard.backpack);
         }
+
+        await pool.execute(
+            `INSERT INTO player_to_show(player_id, age, gender, job, hobby, health, vada, items, color) VALUES( ?,?,?,?,?,?,?,?, ?)`,
+            [
+                player_id,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                playerColor[0].color
+            ]
+        );
 
         // Отримуємо всіх інших гравців з поточної кімнати
         const [otherPlayersRows] = await pool.execute(`
@@ -234,7 +253,7 @@ exports.getPlayerData = async (req, res) => {
                 // Під час генерації нового гравця:
                 const items_ids = itemRows?.map(row => row.items_id).join(',') || '';
 
-                await pool.execute(
+                const [row] =  await pool.execute(
                     'INSERT INTO player (nickname, age, gender, childfreeStatus, color, room_id, job_id, hobby_id, health_id, vada_id, items_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                     [
                         newCard.nickname || `Гравець ${i + 1}`, // Fallback nickname
@@ -250,16 +269,33 @@ exports.getPlayerData = async (req, res) => {
                         items_ids
                     ]
                 );
+                const otherPlayerId = row.insertId;
                 otherPlayers.push(newCard);
+                console.log(otherPlayerId);
+                await pool.execute(
+                    'INSERT INTO player_to_show (player_id, age, gender, color, job, hobby, health, vada, items) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    [
+                        otherPlayerId,
+                        null,
+                        null,
+                        '#FFFFFF',
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ]
+                );
             }
         }
 
         // Повертаємо дані
-        mainCard.color = playerColor[0].color;
+        const [otherPlayersCards] = await pool.execute('SELECT player.nickname, p.player_id, p.age, p.gender, p.color, p.job, p.hobby, p.health, p.vada, p.items FROM player_to_show AS p JOIN player ON p.player_id = player.player_id JOIN room ON player.room_id = room.room_id WHERE player.room_id = ? AND p.player_id <> ?', [room_id, player_id]);
+        console.log(otherPlayersCards);
         return res.status(200).json({
             numPlayers,
             playerInfo: mainCard,
-            otherPlayers: otherPlayers
+            otherPlayers: otherPlayersCards
         });
     } catch (error) {
         console.error('Помилка при отриманні даних гравців:', error);
