@@ -1,24 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
     const prevButton = document.getElementById('prev-story');
     const nextButton = document.getElementById('next-story');
-    const chooseButton = document.querySelector('.button'); // Кнопка "Обрати"
-    let currentStoryId = 0; // Початкове значення історії
-    const roomCode = sessionStorage.getItem('room_code'); // Отримуємо код кімнати з сесії
+    const chooseButton = document.querySelector('.button'); 
+    let currentStoryId = 0;
+    const roomCode = sessionStorage.getItem('room_code'); 
 
 const player_id = sessionStorage.getItem('player_id');
-    const isHost = sessionStorage.getItem('is_host') === 'true'; // Перевіряємо, чи є хостом
-    const socket = io(); // Підключаємо Socket.IO
+    const isHost = sessionStorage.getItem('is_host') === 'true';
+    const socket = io(); 
 
     if (!roomCode) {
         alert('Код кімнати не знайдено. Будь ласка, створіть кімнату спочатку.');
         return;
     }
 
-    console.log('Отриманий room_code:', roomCode); // Логування
+    console.log('Отриманий room_code:', roomCode);
     console.log('Is host:', isHost);
     socket.emit('joinRoom', { room_code: roomCode, player_id: player_id });
 
-    // Функція для завантаження історії
+
     function loadStory(storyId) {
         fetch(`https://no-room-for-you-f8419decc423.herokuapp.com/api/stories/${storyId}`)
             .then(response => {
@@ -40,14 +40,14 @@ const player_id = sessionStorage.getItem('player_id');
             });
     }
 
-    // Обробники подій для кнопок навігації
+
     if (isHost) {
         prevButton.addEventListener('click', () => {
             if (currentStoryId > 1) {
                 currentStoryId--;
                 const newStoryId = currentStoryId % 20 + 1;
                 loadStory(newStoryId);
-                socket.emit('changeStory', { room_code: roomCode, story_id: newStoryId }); // Повідомляємо інших гравців
+                socket.emit('changeStory', { room_code: roomCode, story_id: newStoryId });
             }
         });
 
@@ -55,12 +55,12 @@ const player_id = sessionStorage.getItem('player_id');
             currentStoryId++;
             const newStoryId = currentStoryId % 20 + 1;
             loadStory(newStoryId);
-            socket.emit('changeStory', { room_code: roomCode, story_id: newStoryId }); // Повідомляємо інших гравців
+            socket.emit('changeStory', { room_code: roomCode, story_id: newStoryId }); 
         });
 
-        // Обробник події для кнопки "Обрати"
+  
         chooseButton.addEventListener('click', async (event) => {
-            event.preventDefault(); // Зупиняємо стандартну поведінку форми
+            event.preventDefault(); 
             try {
                 const chosenStoryId = currentStoryId % 20 + 1;
                 const response = await fetch('https://no-room-for-you-f8419decc423.herokuapp.com/api/update-room-story', {
@@ -75,8 +75,8 @@ const player_id = sessionStorage.getItem('player_id');
                 });
                 const data = await response.json();
                 if (response.ok) {
-                    socket.emit('chooseStory', { room_code: roomCode, story_id: chosenStoryId }); // Повідомляємо інших гравців
-                    window.location.href = 'fifth-page.html'; // Переходимо на п'яту сторінку
+                    socket.emit('chooseStory', { room_code: roomCode, story_id: chosenStoryId });
+                    window.location.href = 'fifth-page.html'; 
                 } else {
                     console.error('Помилка при виборі історії:', data.error);
                     alert(`Помилка: ${data.error}`);
@@ -87,23 +87,23 @@ const player_id = sessionStorage.getItem('player_id');
             }
         });
     } else {
-        // Якщо користувач не є хостом, вимикаємо кнопки
+       
         prevButton.disabled = true;
         nextButton.disabled = true;
         chooseButton.disabled = true;
     }
 
-    // Слухачі подій Socket.IO
+   
     socket.on('updateStory', ({ story_id }) => {
         console.log('Отримана нова історія від хоста:', story_id);
-        loadStory(story_id); // Завантажуємо нову історію
+        loadStory(story_id);
     });
 
     socket.on('storyChosen', () => {
         console.log('Хост обрав історію. Переходимо на п\'яту сторінку...');
-        window.location.href = 'fifth-page.html'; // Переходимо на п'яту сторінку
+        window.location.href = 'fifth-page.html'; 
     });
 
-    // Завантажуємо першу історію при завантаженні сторінки
+ 
     loadStory(currentStoryId + 1);
 });

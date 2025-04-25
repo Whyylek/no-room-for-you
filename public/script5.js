@@ -4,7 +4,7 @@ window.addEventListener('DOMContentLoaded', async function () {
     }
     async function fetchDataFromDB() {
         try {
-            const player_id = sessionStorage.getItem('player_id'); // Отримуємо player_id з sessionStorage
+            const player_id = sessionStorage.getItem('player_id'); 
             if (!player_id) {
                 throw new Error('player_id не знайдено в sessionStorage.');
             }
@@ -33,7 +33,7 @@ window.addEventListener('DOMContentLoaded', async function () {
             };
         }
     }
-    // Отримуємо дані з сервера
+
     const dbData = await fetchDataFromDB();
     const numPlayers = dbData.numPlayers || 6;
     const mainContainer = document.querySelector('.main-fifth');
@@ -43,7 +43,7 @@ window.addEventListener('DOMContentLoaded', async function () {
             player.backpack = player.backpack.split(',').map(item => item.trim());
         }
     });
-    // Оновлюємо модальне вікно користувача з даними з БД
+
     const playerModalHtml = `
     <div class="modal" id="playerModal" data-player-id="${dbData.playerInfo.player_id}">
           <div class="modal-inner" style="box-shadow: 0 0 20px ${dbData.playerInfo.color || "white"};">
@@ -113,7 +113,7 @@ window.addEventListener('DOMContentLoaded', async function () {
     });
     modalContainer.innerHTML += modalsHtml;
 
-    // Конфігурація для розміщення гравців на сторінці
+
     const positions = {
         6: { top: 1, sides: 2 },
         7: { top: 2, sides: 2 },
@@ -124,10 +124,9 @@ window.addEventListener('DOMContentLoaded', async function () {
         12: { top: 5, sides: 3 }
     };
     const config = positions[numPlayers] || positions[6];
-    // Генеруємо основний HTML для розміщення гравців
-    // Додаємо головного гравця в контейнер першим, щоб він був під іншими елементами
+
     let html = `<div class="player"><span class="player-name">${dbData.playerInfo.nickname || 'Ви'}</span><button class="player-card" id="openModal"></button></div>`;
-    // Додаємо верхніх гравців
+  
     html += '<div class="up-and-down">';
     html += '<div class="up-players">';
     for (let i = 1; i <= config.top; i++) {
@@ -140,7 +139,7 @@ window.addEventListener('DOMContentLoaded', async function () {
     }
     html += '</div>';
     html += '</div>';
-    // Додаємо бічних гравців
+
     html += '<div class="left-and-right">';
     html += '<div class="side-players">';
     for (let i = config.top + 1; i <= config.top + config.sides; i++) {
@@ -157,7 +156,7 @@ window.addEventListener('DOMContentLoaded', async function () {
     html += '</div></div>';
     mainContainer.innerHTML = html;
 
-    // Функція для закриття всіх модальних вікон
+   
     function closeAllModals() {
         document.getElementById("playerModal").classList.remove("open");
         document.querySelector(".player-card").style.opacity = "1";
@@ -170,7 +169,7 @@ window.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // Додаємо обробники подій для модального вікна користувача
+
     const openBtn = document.getElementById("openModal");
     const closeBtn = document.getElementById("closeModal");
     const modal = document.getElementById("playerModal");
@@ -191,8 +190,8 @@ window.addEventListener('DOMContentLoaded', async function () {
     confirmBtn.addEventListener("click", () => {
         const selectedRadio = document.querySelector('#playerModal input[type="radio"]:checked');
         if (selectedRadio) {
-            selectedRadio.style.display = "none"; // Hide the radio button
-            // Get the label associated with this radio button
+            selectedRadio.style.display = "none"; 
+         
             const label = document.querySelector(`label[for="${selectedRadio.id}"]`);
             if (label) {
                 label.style.pointerEvents = "none";
@@ -200,7 +199,7 @@ window.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
-    // Додаємо обробники подій для інших гравців
+
     dbData.otherPlayers.forEach((player, index) => {
         const playerButton = document.getElementById(`player${index + 1}`);
         const playerModal = document.getElementById(`playerModal${index + 1}`);
@@ -227,7 +226,7 @@ window.addEventListener('DOMContentLoaded', async function () {
 
     function createVotingOptions(numPlayers) {
         let votingOptionsHtml = '';
-        // Додаємо опції для всіх гравців, крім головного (Ви)
+       
         dbData.otherPlayers.forEach((player, index) => {
             votingOptionsHtml += `
                 <div class="vote-option">
@@ -241,18 +240,18 @@ window.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // Створюємо опції голосування на основі кількості гравців
+
     createVotingOptions(numPlayers);
 
     socket.on('roomJoined', function(data) {
         const { position, isHost } = data;
-        //sessionStorage.setItem('is_host', isHost ? 'true' : 'false');    
+      
         console.log(`Гравець зайшов у кімнату. Роль: ${isPlayerHost ? 'Хост' : 'Гравець'}`);
         if (startVoteButton) {
-            // Показуємо або ховаємо кнопку
+          
             startVoteButton.style.display = isPlayerHost ? 'block' : 'none';
             console.log(`Кнопка "Почати голосування" показана для хоста: ${isPlayerHost}`);
-            // Додаємо або перестворюємо обробник КОРЕКТНО (уникаємо дублювань)
+        
             startVoteButton.onclick = () => {
                 if (!isPlayerHost) {
                     alert("Ви не є хостом!");
@@ -265,7 +264,7 @@ window.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
-    // Обробник закриття модального вікна голосування
+
     if (closeVoteModal) {
         closeVoteModal.addEventListener('click', () => {
             voteModal.classList.remove('open');
@@ -273,7 +272,7 @@ window.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
-    // Обробка підтвердження голосування
+
     if (confirmVoteButton) {
         confirmVoteButton.addEventListener('click', () => {
             const selectedPlayer = document.querySelector('input[name="vote"]:checked');
@@ -283,18 +282,18 @@ window.addEventListener('DOMContentLoaded', async function () {
             }
             const playerId = selectedPlayer.value;
             const roomCode = sessionStorage.getItem('room_code');
-            // Відправляємо команду на сервер для вигнання гравця
+     
             socket.emit('kickPlayer', { room_code: roomCode, playerId });
-            // Закриваємо модальне вікно голосування
+          
             voteModal.classList.remove('open');
             console.log(`Гравець з ID ${playerId} вигнаний.`);
         });
     }
 
-    // Додаємо гравців до списку, включаючи хоста
+
     function renderPlayersList(players) {
         const playersContainer = document.querySelector('.main-fifth');
-        playersContainer.innerHTML = ''; // Очищаємо контейнер
+        playersContainer.innerHTML = ''; 
         players.forEach((player, index) => {
             console.log(player);
             const playerHtml = `
@@ -307,12 +306,12 @@ window.addEventListener('DOMContentLoaded', async function () {
             playersContainer.innerHTML += playerHtml;
         });
 
-        // Після оновлення списку гравців перевіряємо роль хоста
+      
         if (startVoteButton) {
             startVoteButton.style.display = isHost() ? 'block' : 'none';
         }
 
-        // Додаємо обробники для кнопок "Вигнати"
+     
         if (isHost()) {
             document.querySelectorAll('.kick-button').forEach(button => {
                 button.addEventListener('click', () => {
@@ -325,17 +324,17 @@ window.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // Оновлюємо список гравців при отриманні даних від сервера
+  
     socket.on('roomUpdate', function(data) {
         const { players } = data;
         renderPlayersList(players);
     });
 
-    // Обробник події "гравець вигнаний"
+    
     socket.on('playerKicked', function(data) {
         const { playerId } = data;
         console.log('Отримано команду кікнути гравця з ID:', playerId);
-        // Правильно: шукаємо елемент із відповідним data-player-id
+ 
         const playerCircle = document.querySelector(`button.player-circle[data-player-id="${playerId}"]`);
         if (playerCircle) {
             playerCircle.style.opacity = 0.5;
@@ -356,60 +355,60 @@ window.addEventListener('DOMContentLoaded', async function () {
         modalRules.classList.remove("open");
     });
 
-    // Отримуємо елементи таймера
+  
 const timerElement = document.getElementById('timer');
 const startBtn = document.getElementById('startBtn');
 const resetBtn = document.getElementById('resetBtn');
 
-// Функція для оновлення відображення таймера
+
 function updateTimerDisplay(timeLeft) {
     const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
     const secs = (timeLeft % 60).toString().padStart(2, '0');
     timerElement.textContent = `${mins}:${secs}`;
 }
 
-// Подія для запуску таймера
+
 startBtn.addEventListener('click', () => {
     const roomCode = sessionStorage.getItem('room_code');
     if (isHost()) {
-        socket.emit('startTimer', { room_code: roomCode }); // Запускаємо таймер на сервері
+        socket.emit('startTimer', { room_code: roomCode }); 
     } else {
         alert("Ви не є хостом!");
     }
 });
 
-// Подія для зупинки таймера
+
 resetBtn.addEventListener('click', () => {
     const roomCode = sessionStorage.getItem('room_code');
     if (isHost()) {
-        socket.emit('stopTimer', { room_code: roomCode }); // Зупиняємо таймер на сервері
+        socket.emit('stopTimer', { room_code: roomCode }); 
     } else {
         alert("Ви не є хостом!");
     }
 });
 
-// Обробник оновлення таймера
+
 socket.on('updateTimer', function(data) {
     const { timeLeft } = data;
-    updateTimerDisplay(timeLeft); // Оновлюємо відображення таймера
+    updateTimerDisplay(timeLeft); 
 });
 
-// Обробник завершення таймера
-socket.on('timerFinished', function() { // Повідомляємо про завершення
-    updateTimerDisplay(0); // Встановлюємо час на "00:00"
+
+socket.on('timerFinished', function() { 
+    updateTimerDisplay(0); 
 });
 
-// Обробник зупинки таймера
-socket.on('timerStopped', function() {// Повідомляємо про зупинку
-    updateTimerDisplay(60); // Встановлюємо час на початкове значення
+
+socket.on('timerStopped', function() {
+    updateTimerDisplay(60); 
 });
     
 
 
-    // Додаємо явну перевірку встановлення з'єднання
+ 
     socket.on('connect', function() {
         console.log('Сокет підключено успішно. ID сокета:', socket.id);
-        // Приєднуємось до кімнати відразу після підключення
+
         const roomCode = sessionStorage.getItem('room_code');
         if (roomCode) {
             socket.emit('joinGameRoom', { room_code: roomCode });
@@ -425,7 +424,7 @@ socket.on('timerStopped', function() {// Повідомляємо про зуп�
         console.error('Помилка сокета:', error);
     });
 
-    // 2. Створюємо нову подію для тестування сокетів
+
     function testSocketConnection() {
         const roomCode = sessionStorage.getItem('room_code');
         if (roomCode) {
@@ -434,12 +433,12 @@ socket.on('timerStopped', function() {// Повідомляємо про зуп�
         }
     }
 
-    // Обробник тестового повідомлення
+
     socket.on('testResponse', function(data) {
         console.log('Отримано відповідь на тестове повідомлення:', data);
     });
 
-    // Оновлена функція для оновлення всіх характеристик
+ 
     socket.on('updateAttributeVisibility', function(data) {
         const { players } = data;
     
@@ -454,7 +453,7 @@ socket.on('timerStopped', function() {// Повідомляємо про зуп�
                     
                     if (span) {
                         let value = '';
-                        // Визначаємо значення атрибута з врахуванням назв колонок БД
+                        
                         switch(attributeId) {
                             case 'gender':
                                 value = player.gender ? `${player.gender}` : null;
@@ -479,7 +478,7 @@ socket.on('timerStopped', function() {// Повідомляємо про зуп�
                                 break;
                         }
                         
-                        // Оновлюємо відображення
+                      
                         if (value) {
                             span.textContent = value;
                             span.style.opacity = '1';
@@ -493,11 +492,11 @@ socket.on('timerStopped', function() {// Повідомляємо про зуп�
         });
     });
 
-    // Додаємо обробник для радіобатонів
+  
     document.querySelectorAll('#playerModal input[type="radio"]').forEach(radio => {
         radio.addEventListener('click', async () => {
             const playerId = sessionStorage.getItem('player_id');
-            const attributeId = radio.id; // ID атрибута (наприклад, "age", "profession")
+            const attributeId = radio.id; 
             const roomCode = sessionStorage.getItem('room_code');
             const playerNickname = document.querySelector('#playerModal h3').textContent || 'ВИ';
 
@@ -506,7 +505,7 @@ socket.on('timerStopped', function() {// Повідомляємо про зуп�
                 return;
             }
 
-            // Знаходимо мітку з атрибутом
+          
             const selfModal = document.getElementById('playerModal');
             const selfModalLabel = selfModal.querySelector(`label[for="${attributeId}"]`);
             if (!selfModalLabel) {
@@ -520,7 +519,7 @@ socket.on('timerStopped', function() {// Повідомляємо про зуп�
                 return;
             }
 
-            const attributeValue = span.textContent.trim(); // Отримуємо текстове значення атрибута
+            const attributeValue = span.textContent.trim(); 
             console.log(`Відправляємо відкриття атрибуту: ${attributeId} (${attributeValue}) для гравця ${playerId} (${playerNickname})`);
 
           
@@ -533,7 +532,7 @@ socket.on('timerStopped', function() {// Повідомляємо про зуп�
                 attributeId, 
                 roomCode,
                 playerNickname,
-                attributeValue // Відправляємо коректне значення атрибута
+                attributeValue 
             });
         });
     });

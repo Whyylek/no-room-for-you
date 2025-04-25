@@ -3,12 +3,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (form) {
         form.addEventListener("submit", async function (event) {
-            event.preventDefault(); // Запобігаємо стандартну поведінку форми
+            event.preventDefault(); 
 
             const nicknameInput = document.getElementById("name");
             const nickname = nicknameInput.value.trim();
 
-            console.log('➡️ Відправляємо нікнейм:', nickname); // Логування
+            console.log('➡️ Відправляємо нікнейм:', nickname); 
 
             if (!nickname) {
                 alert("Будь ласка, введіть ім'я!");
@@ -25,8 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     body: JSON.stringify({ nickname })
                 });
 
-                console.log('⬅️ Відповідь від сервера:', response); // Логування
-
+                console.log('⬅️ Відповідь від сервера:', response); 
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(`HTTP error! Status: ${response.status} - ${errorData.error}`);
@@ -35,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const data = await response.json();
                 console.log('✅ Успішна відповідь:', data);
                 sessionStorage.setItem('player_id', data.id);
-                window.location.href = "second-page.html"; // Переходимо на другу сторінку
+                window.location.href = "second-page.html"; 
            
             
         });

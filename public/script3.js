@@ -1,5 +1,5 @@
 
-// Socket.IO підключення
+
 const socket = io('https://no-room-for-you-f8419decc423.herokuapp.com');
 const room_code = sessionStorage.getItem('room_code');
 const player_id = sessionStorage.getItem('player_id');
@@ -12,21 +12,21 @@ socket.on('connect', () => {
 
 let playerPosition = null;
 
-// Обробка відповіді на приєднання
+
 socket.on('roomJoined', ({ position, playersInRoom }) => {
     console.log(`📦 Ви — Гравець ${position}`);
     playerPosition = position;
     updatePlayersUI(playersInRoom);
 });
 
-// Обробка оновлення списку гравців кімнати
+
 socket.on('roomUpdate', ({ players, usedColors }) => {
     updatePlayersUI(players);
     usedColorsArr = usedColors;
-    updateColorButtons(usedColors); // Оновлюємо кнопки кольорів
+    updateColorButtons(usedColors); 
 });
 
-// Оновлення UI гравців
+
 function updatePlayersUI(players) {
     const playersList = document.getElementById('players-list');
     playersList.innerHTML = '';
@@ -37,7 +37,7 @@ function updatePlayersUI(players) {
     });
 }
 
-// Створення елемента гравця
+
 function createPlayerElement(playerName, playerClass, playerColor) {
     const playerDiv = document.createElement('div');
     playerDiv.classList.add('players', playerClass);
@@ -58,7 +58,7 @@ function createPlayerElement(playerName, playerClass, playerColor) {
     return playerDiv;
 }
 
-// Відкриття модального вікна для вибору кольору
+
 function openModal(playerElement) {
     const playerClasses = playerElement.closest('.players').classList;
     const currentPlayerClass = `player-${player_id}`;
@@ -75,7 +75,7 @@ function closeModal() {
 }
 
 function selectColor(color) {
-    //const usedColors = Array.from(document.querySelectorAll('.players-color')).map(el => el.style.backgroundColor);
+   
     console.log(usedColorsArr);
     if (window.selectedPlayerElement && window.selectedPlayerElement.closest('.players').classList.contains(`player-${player_id}`)) {
         if (!usedColorsArr.includes(color)) {
@@ -106,77 +106,77 @@ function updateColorButtons(usedColors) {
     });
 }
 
-// Отримуємо кнопку "Початок гри"
+
 const startGameButton = document.getElementById('startGameButton');
-// Обробник події для кнопки "Початок гри"
+
 startGameButton.addEventListener('click', () => {
     if (!isHost) {
         alert('Лише хост може починати гру!');
         return;
     }
-    // Перевіряємо кількість гравців
+ 
     socket.emit('checkPlayerCount', { room_code });
 });
 
-// Обробка відповіді від сервера про кількість гравців
+
 socket.on('playerCountResponse', ({ playerCount }) => {
-    if (playerCount < 1) { // Мінімум 6 гравців для початку гри
+    if (playerCount < 1) { 
         alert('Гра може починатися лише при 6 або більше гравцях!');
         return;
     }
-    // Якщо всі умови виконані, повідомляємо сервер про початок гри
+   
     socket.emit('startGame', { room_code });
 });
 
-// Обробка сигналу про початок гри від сервера
+
 socket.on('redirectPlayers', () => {
-    window.location.href = 'fourth-page.html'; // Перенаправлення на наступну сторінку
+    window.location.href = 'fourth-page.html'; 
 });
 
-// Обробник події для кнопки "Початок гри"
+
 startGameButton.addEventListener('click', () => {
     if (!isHost) {
         alert('Лише хост може починати гру!');
         return;
     }
 
-    // Перевіряємо кількість гравців
+
     socket.emit('checkPlayerCount', { room_code });
 });
 
-// Обробка відповіді від сервера про кількість гравців
+
 socket.on('playerCountResponse', ({ playerCount }) => {
     if (playerCount < 1) {
         alert('Гра може починатися лише при 6 або більше гравцях!');
         return;
     }
 
-    // Якщо всі умови виконані, перенаправляємо на наступну сторінку
+   
     window.location.href = 'fourth-page.html';
 });
 
-// Логіка копіювання запрошення
+
 document.querySelector('.button2').addEventListener('click', function () {
-    const roomCode = sessionStorage.getItem('room_code'); // Отримуємо код кімнати
+    const roomCode = sessionStorage.getItem('room_code'); 
     if (!roomCode) {
         alert('Код кімнати не знайдено!');
         return;
     }
 
-    // Створюємо тимчасовий елемент для копіювання
+
     const tempInput = document.createElement('input');
     document.body.appendChild(tempInput);
-    tempInput.value = roomCode; // Копіюємо саме код кімнати
+    tempInput.value = roomCode; 
     tempInput.select();
     document.execCommand('copy');
     document.body.removeChild(tempInput);
 
-    // Змінюємо повідомлення на "Код кімнати успішно скопійовано!"
+   
     const message = document.getElementById('copyMessage');
     message.textContent = 'Код кімнати успішно скопійовано!';
     message.style.display = 'block';
 
-    // Приховуємо повідомлення через 2 секунди
+
     setTimeout(function () {
         message.style.display = 'none';
     }, 2000);

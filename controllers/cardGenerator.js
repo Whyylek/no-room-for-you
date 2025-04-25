@@ -1,13 +1,11 @@
 const fs = require('fs');
 const mysql = require('mysql2/promise');
 
-// Функція для завантаження даних з бази даних
 const loadDataFromDB = async (connection, tableName, columnName) => {
     const [rows] = await connection.execute(`SELECT ${columnName} FROM ${tableName}`);
     return rows.map(row => row[columnName]);
 };
 
-// Визначення віку з вагами
 const assignAgeWeighted = () => {
     const ageGroups = [
         { min: 18, max: 30, weight: 0.5 },
@@ -21,24 +19,23 @@ const assignAgeWeighted = () => {
     return getRandomInt(chosenGroup.min, chosenGroup.max);
 };
 
-// Вибір статі
+
 const assignGender = () => {
     return Math.random() < 0.5 ? "Чоловік" : "Жінка";
 };
 
 
-// Вибір кількох предметів з рюкзака
 const assignBackpackItems = (items, numItems = 2) => {
     if (!items.length) {
         console.error('Масив предметів порожній.');
         return [];
     }
-    // Обмежуємо кількість предметів до доступної кількості
+
     const maxItems = Math.min(numItems, items.length);
     return getRandomElements(items, maxItems);
 };
 
-// Генерація картки з усіма характеристиками
+
 const generateCardWithBackpack = (professions, skills, healthConditions, flaws, backpackItems) => {
     const age = assignAgeWeighted();
     const gender = assignGender();
@@ -60,7 +57,7 @@ const generateCardWithBackpack = (professions, skills, healthConditions, flaws, 
     };
 };
 
-// Допоміжні функції
+
 const getRandomInt = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
@@ -84,10 +81,10 @@ const weightedRandomIndex = (weights) => {
             return i;
         }
     }
-    return weights.length - 1; // fallback in case of rounding errors
+    return weights.length - 1;
 };
 
-// Експорт функцій
+
 module.exports = {
     loadDataFromDB,
     generateCardWithBackpack

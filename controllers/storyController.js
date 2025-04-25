@@ -1,21 +1,20 @@
-const db = require('../db/db'); // Імпортуємо пул підключень
-
+const db = require('../db/db');
 exports.getStory = async (req, res) => {
     const { storyId } = req.params;
    
 
     try {
-        console.log('➡️ Спроба підключення до бази даних...'); // Логування
+        console.log('➡️ Спроба підключення до бази даних...'); 
         const pool = db();
         const [rows] = await pool.execute(
             'SELECT story_id AS id, story, story_name AS storyName FROM story WHERE story_id = ?',
             [storyId]
         );
 
-        console.log('✅ Результат запиту:', rows); // Логування
+        console.log('✅ Результат запиту:', rows); 
 
         if (rows.length > 0) {
-            return res.status(200).json(rows[0]); // Повертаємо першу знайдену історію
+            return res.status(200).json(rows[0]); 
         } else {
             return res.status(404).json({ error: 'Історію не знайдено.' });
         }
@@ -31,7 +30,7 @@ exports.updateRoomStory = async (req, res) => {
     }
 
     try {
-        console.log('Отримані дані:', { room_code, story_id }); // Логування
+        console.log('Отримані дані:', { room_code, story_id }); 
         const pool = db();
         const [result] = await pool.execute(
             'UPDATE room SET story_id = ? WHERE room_code = ?',

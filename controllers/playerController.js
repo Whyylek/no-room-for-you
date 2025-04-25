@@ -27,18 +27,18 @@ exports.getPlayerData = async (req, res) => {
     try {
         const pool = db();
 
-        // Отримуємо кількість гравців з таблиці `room`
+
         const [roomRows] = await pool.execute('SELECT room_id, player_number FROM room ORDER BY room_id DESC LIMIT 1');
         const numPlayers = roomRows.length > 0 ? parseInt(roomRows[0].player_number) : 6;
         const room_id = roomRows.length > 0 ? roomRows[0].room_id : null;
 
-        // Отримуємо ID головного гравця з query параметрів
+
         const player_id = req.query.player_id;
         if (!player_id) {
             return res.status(400).json({ error: 'player_id is required.' });
         }
 
-        // Отримуємо дані головного гравця з бази даних
+
         const [mainPlayerRow] = await pool.execute('SELECT * FROM player WHERE player_id = ?', [player_id]);
         if (!mainPlayerRow.length) {
             return res.status(404).json({ error: 'Головний гравець не знайдений.' });
@@ -47,15 +47,14 @@ exports.getPlayerData = async (req, res) => {
 
         
 
-        // Завантажуємо дані для генерації карток
+
         const [professions] = await pool.execute('SELECT * FROM job');
         const [skills] = await pool.execute('SELECT * FROM hobby');
         const [healthConditions] = await pool.execute('SELECT * FROM health');
         const [flaws] = await pool.execute('SELECT * FROM vada');
         const [backpackItems] = await pool.execute('SELECT * FROM items');
 
-        // Генеруємо характеристики головного гравця (якщо їх немає в БД)
-       // Після отримання mainPlayer з БД:
+
         let mainCard = generateCardWithBackpack(professions, skills, healthConditions, flaws, backpackItems);
         mainPlayer.job_id = mainCard.profession.job_id;
         mainPlayer.hobby_id = mainCard.skill.hobby_id;
@@ -67,51 +66,7 @@ exports.getPlayerData = async (req, res) => {
         mainPlayer.childfreeStatus = mainCard.childfreeStatus;
         console.log(mainCard);
         console.log(mainPlayer);
-        // Якщо job_id немає - згенерувати нову професію
-        // if (!mainPlayer.job_id) {
-        //     const randomJob = professions[Math.floor(Math.random() * professions.length)].job;
-        //     mainCard.profession = randomJob;
-        //     // Оновлення job_id в БД
-        //     const [jobRow] = await pool.execute('SELECT job_id FROM job WHERE job = ?', [randomJob]);
-        //     mainPlayer.job_id = jobRow[0]?.job_id;
-        // }
-        
-        // // Аналогічно для інших полів:
-        // if (!mainPlayer.hobby_id) {
-        //     const randomSkill = skills[Math.floor(Math.random() * skills.length)].hobby;
-        //     mainCard.skill = randomSkill;
-        //     const [hobbyRow] = await pool.execute('SELECT hobby_id FROM hobby WHERE hobby = ?', [randomSkill]);
-        //     mainPlayer.hobby_id = hobbyRow[0]?.hobby_id;
-        // }
-        
-        // if (!mainPlayer.health_id) {
-        //     const randomHealth = healthConditions[Math.floor(Math.random() * healthConditions.length)].health;
-        //     mainCard.health = randomHealth;
-        //     const [healthRow] = await pool.execute('SELECT health_id FROM health WHERE health = ?', [randomHealth]);
-        //     mainPlayer.health_id = healthRow[0]?.health_id;
-        // }
-        
-        // if (!mainPlayer.vada_id) {
-        //     const randomFlaw = flaws[Math.floor(Math.random() * flaws.length)].vada;
-        //     mainCard.flaw = randomFlaw;
-        //     const [flawRow] = await pool.execute('SELECT vada_id FROM vada WHERE vada = ?', [randomFlaw]);
-        //     mainPlayer.vada_id = flawRow[0]?.vada_id;
-        // }
-        
-        // // Генерація предметів, якщо items_id відсутній
-        // if (!mainPlayer.items_id) {
-        //     const randomItems = backpackItems
-        //         .sort(() => 0.5 - Math.random())
-        //         .slice(0, 3)
-        //         .map(item => item.items);
-        //     mainCard.backpack = randomItems;
-        //     const itemIds = randomItems.map(item => 
-        //         backpackItems.find(i => i.items === item).items_id
-        //     );
-        //     mainPlayer.items_id = itemIds.join(',');
-        // }
-        
-        // Оновлення даних гравця в БД
+
         await pool.execute(
             `UPDATE player SET 
                 age = ?,
@@ -143,7 +98,7 @@ exports.getPlayerData = async (req, res) => {
 
         
 
-        // Отримуємо дані з пов'язаних таблиць для головного гравця
+
         if (mainPlayer.job_id) {
             const [jobRow] = await pool.execute('SELECT job FROM job WHERE job_id = ?', [mainPlayer.job_id]);
             mainCard.profession = jobRow[0]?.job || '';
@@ -185,7 +140,6 @@ exports.getPlayerData = async (req, res) => {
             ]
         );
 
-        // Отримуємо всіх інших гравців з поточної кімнати
         const [otherPlayersRows] = await pool.execute(`
             SELECT p.*, 
                    j.job AS profession, 
@@ -217,7 +171,7 @@ exports.getPlayerData = async (req, res) => {
             color: player.color
         }));
 
-        // Якщо кількість інших гравців менша за необхідну, генеруємо нових
+
         const requiredOtherPlayers = numPlayers - 1;
         if (otherPlayers.length < requiredOtherPlayers) {
             const toGenerate = requiredOtherPlayers - otherPlayers.length;
@@ -230,13 +184,13 @@ exports.getPlayerData = async (req, res) => {
                     backpackItems.map(b => b.items)
                 );
             
-                // Ensure all required fields are present (add defaults if necessary)
-                newCard.age = newCard.age ?? 0; // Default age to 0 if missing
-                newCard.gender = newCard.gender ?? 'Unknown'; // Default gender
-                newCard.childfreeStatus = newCard.childfreeStatus ?? 'No'; // Default childfree status
+                
+                newCard.age = newCard.age ?? 0; 
+                newCard.gender = newCard.gender ?? 'Unknown'; 
+                newCard.childfreeStatus = newCard.childfreeStatus ?? 'No'; 
 
 
-                // Зберігаємо нового гравця в БД
+               
                 const [jobRow] = await pool.execute('SELECT job_id FROM job WHERE job = ?', [newCard.profession]);
                 const job_id = jobRow.length ? jobRow[0].job_id : null;
 
@@ -250,16 +204,16 @@ exports.getPlayerData = async (req, res) => {
                 const vada_id = flawRow.length ? flawRow[0].vada_id : null;
 
                 const [itemRows] = await pool.execute('SELECT items_id FROM items WHERE items IN (?)', [newCard.backpack]);
-                // Під час генерації нового гравця:
+              
                 const items_ids = itemRows?.map(row => row.items_id).join(',') || '';
 
                 const [row] =  await pool.execute(
                     'INSERT INTO player (nickname, age, gender, childfreeStatus, color, room_id, job_id, hobby_id, health_id, vada_id, items_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                     [
-                        newCard.nickname || `Гравець ${i + 1}`, // Fallback nickname
-                        newCard.age, // Now guaranteed to be defined
-                        newCard.gender, // Now guaranteed to be defined
-                        newCard.childfreeStatus, // Now guaranteed to be defined
+                        newCard.nickname || `Гравець ${i + 1}`, 
+                        newCard.age, 
+                        newCard.gender, 
+                        newCard.childfreeStatus, 
                         '#FFFFFF',
                         room_id,
                         job_id,
@@ -289,7 +243,7 @@ exports.getPlayerData = async (req, res) => {
             }
         }
 
-        // Повертаємо дані
+
         const [otherPlayersCards] = await pool.execute('SELECT player.nickname, p.player_id, p.age, p.gender, p.color, p.job, p.hobby, p.health, p.vada, p.items FROM player_to_show AS p JOIN player ON p.player_id = player.player_id JOIN room ON player.room_id = room.room_id WHERE player.room_id = ? AND p.player_id <> ?', [room_id, player_id]);
         console.log(otherPlayersCards);
         return res.status(200).json({

@@ -1,7 +1,7 @@
 require('dotenv').config();
 const mysql = require('mysql2/promise');
 
-// Функція для ініціалізації пулу підключень
+
 const initializeDatabase = () => {
     const pool = mysql.createPool({
         host: process.env.DB_HOST,
@@ -13,11 +13,11 @@ const initializeDatabase = () => {
         queueLimit: 0
     });
 
-    // Тестове підключення до бази даних
+   
     pool.getConnection()
         .then(connection => {
             console.log('✅ Підключення до бази даних успішне.');
-            connection.release(); // Повертаємо з'єднання у пул
+            connection.release();
         })
         .catch(error => {
             console.error('❌ Помилка підключення до бази даних:', error.message);

@@ -33,7 +33,6 @@ const modalMessage = document.createElement("p");
 
 document.querySelector('.url-container').appendChild(modalMessage);
 
-// ✅ Кнопка "СТВОРИТИ"
 document.querySelector('.buttons-main button').addEventListener("click", async () => {
     
     
@@ -41,12 +40,12 @@ document.querySelector('.buttons-main button').addEventListener("click", async (
     const room_code = generateRoomCode()
     sessionStorage.setItem('room_code', room_code); 
     await createRoom(6, room_code);
-    // чекаємо завершення
-    window.location.href = 'third-page.html'; // перехід після збереження room_code
+   
+    window.location.href = 'third-page.html';
 });
 
 
-// ✅ Кнопка "ПРИЄДНАТИСЯ"
+
 openBtn.addEventListener("click", () => {
     modal.classList.add("open");
 });
@@ -120,7 +119,7 @@ async function createRoom(playerNumber, roomCode) {
       }
   
       const data = await response.json();
-      //sessionStorage.setItem('room_code', data.room_code);
+     
       console.log('✅ Кімнату створено:', data);
       if (data.room_code) {
         roomCode = data.room_code;

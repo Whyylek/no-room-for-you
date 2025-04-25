@@ -1,13 +1,12 @@
 const db = require('../db/db');
 
-// Генератор унікального коду кімнати
 
 
 async function getRoomByCode(room_code) {
     try {
         const pool = db();
         const [rows] = await pool.execute('SELECT * FROM room WHERE room_code = ?', [room_code]);
-        return rows.length > 0 ? rows[0] : null; // Повертаємо кімнату або null
+        return rows.length > 0 ? rows[0] : null;
     } catch (error) {
         console.error('Помилка при отриманні кімнати:', error);
         throw error;
@@ -26,9 +25,7 @@ exports.createRoom = async (req, res) => {
     try {
         const pool = db();
 
-        // Перевіряємо, чи існує кімната за room_code
         
-            // Якщо кімнати немає, створюємо нову
             const newRoomCode = room_code;
             const [result] = await pool.execute(
                 'INSERT INTO room (room_code, player_number) VALUES (?, ?)',
@@ -89,7 +86,7 @@ exports.findRoom = async (req, res) => {
     try {
         const pool = db();
 
-        // Перевіряємо, чи існує кімната за room_code
+
         let existingRoom = null;
         if (room_code) {
             existingRoom = await getRoomByCode(room_code);
